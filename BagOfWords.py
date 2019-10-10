@@ -2,6 +2,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.corpus import brown
 from nltk.stem.snowball import SnowballStemmer
+from os import listdir, path
 
 # nltk.download()
 
@@ -9,16 +10,21 @@ from nltk.stem.snowball import SnowballStemmer
 language = 'english'
 
 # (brown.words()) #testing nltk
-email1 = open("./inputEmails/Email1.txt", "r")
-email2 = open("./inputEmails/Email2.txt", "r")
-email3 = open("./inputEmails/Email3.txt", "r")
-email1p = email1
-email2p = email2
-email3p = email3
+
+directory = './inputEmails'
+def loadingDirectory(directory):
+    documents = ""
+    if not path.exists(directory):
+        print('no folder exists')
+    for filename in listdir(directory):
+        pathToFile = directory + '/' + filename
+        email= open(pathToFile, 'r', encoding='utf-8')
+        documents = documents + " " + str(email.read())
+        email.close()
+    return documents
 
 
 def tokenize(textfile):
-    textfile = str(textfile.read())
     tokens = nltk.word_tokenize(textfile, language, False)
     return tokens
 
@@ -37,9 +43,8 @@ def removeSymbols(arrayOfStrings):
     new_word_list = arrayOfStrings
     for index in arrayOfStrings:
         if index in list_of_removing_symbols:
-            new_word_list.remove(index)
-        return new_word_list
-
+           new_word_list.remove(index)
+    return new_word_list
 
 def stemming(arrayOfStrings):
     new_word_list = []
@@ -56,12 +61,7 @@ def removeDuplicates(arraOfStrings):
 
 # def printSignificantWords
 
-# def
+ #def mergeArrays():
 
-print(removeDuplicates(stemming(removeSymbols(removeStopwords(tokenize(email1))))))
-print(removeDuplicates(stemming(removeSymbols(removeStopwords(tokenize(email2))))))
-print(removeDuplicates(stemming(removeSymbols(removeStopwords(tokenize(email3))))))
+print(removeDuplicates(stemming(removeSymbols(removeStopwords(tokenize(loadingDirectory(directory)))))))
 
-print(email1p.read())
-print(email2p.read())
-print(email3p.read())
