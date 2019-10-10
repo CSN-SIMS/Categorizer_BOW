@@ -46,7 +46,7 @@ def loadingFilesIntoArray(directory):
 
 
 def printSignificantWordOfFile(filecontent):
-    return stemming(removeSymbols(removeStopwords(tokenize(filecontent))))
+    return sortArray(stemming(removeSymbols(removeStopwords(tokenize(filecontent)))))
 
 
 def tokenize(textfile):
@@ -86,14 +86,20 @@ def removeDuplicates(arraOfStrings):
 
 
 def printSignificantWordsofDirectory(directoryPath):
-    print(removeDuplicates(stemming(removeSymbols(removeStopwords(tokenize(loadingDirectory(directoryPath)))))))
-    return removeDuplicates(stemming(removeSymbols(removeStopwords(tokenize(loadingDirectory(directoryPath))))))
+    print(sortArray(removeDuplicates(stemming(removeSymbols(removeStopwords(tokenize(loadingDirectory(directoryPath))))))))
+    return sortArray(removeDuplicates(stemming(removeSymbols(removeStopwords(tokenize(loadingDirectory(directoryPath)))))))
+
+def sortArray(array):
+    array.sort()
+    return array
+
 
 def countOccurencyOfWordsPerEmail(directory):
     vectorMatrix = []
     arrayOfSigWordsTotal = printSignificantWordsofDirectory(directory)
     arrayOfSigWordsFile = loadingFilesIntoArray(directory)
     for array in arrayOfSigWordsFile:
+        vectorMatrix = vectorMatrix + []
         for word in array:
             for wordtotal in arrayOfSigWordsTotal:
                 if word == wordtotal:
