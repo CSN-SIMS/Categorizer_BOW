@@ -1,8 +1,7 @@
-import nltk
-from nltk.corpus import stopwords
-from nltk.corpus import brown
-from nltk.stem.snowball import SnowballStemmer
 from os import listdir, path
+
+import nltk
+from nltk.stem.snowball import SnowballStemmer
 
 # nltk.download()
 
@@ -41,12 +40,11 @@ def loadingFilesIntoArray(directory):
         document = str(email.read())
         arrayofEmails.append(printSignificantWordOfFile(document))
         email.close()
-    print(arrayofEmails)
     return arrayofEmails
 
 
 def printSignificantWordOfFile(filecontent):
-    return sortArray(stemming(removeSymbols(removeStopwords(tokenize(filecontent)))))
+    return sortArray(stemming(removeSymbols(removeStopwordsLowerCase(tokenize(filecontent)))))
 
 
 def tokenize(textfile):
@@ -54,7 +52,7 @@ def tokenize(textfile):
     return tokens
 
 
-def removeStopwords(arrayOfStrings):
+def removeStopwordsLowerCase(arrayOfStrings):
     new_word_list = []
     for word in arrayOfStrings:
         word = word.lower()
@@ -64,8 +62,8 @@ def removeStopwords(arrayOfStrings):
 
 
 def removeSymbols(arrayOfStrings):
-    list_of_removing_symbols = ['.', '!', ',']
-    new_word_list = arrayOfStrings
+    list_of_removing_symbols = ['.', '!', ',', '?', '??', '!!']
+    new_word_list = arrayOfStrings.copy()
     for index in arrayOfStrings:
         if index in list_of_removing_symbols:
             new_word_list.remove(index)
@@ -86,10 +84,18 @@ def removeDuplicates(arraOfStrings):
 
 
 def printSignificantWordsofDirectory(directoryPath):
-    print(sortArray(removeDuplicates(stemming(removeSymbols(removeStopwords(tokenize(loadingDirectory(directoryPath))))))))
-    return sortArray(removeDuplicates(stemming(removeSymbols(removeStopwords(tokenize(loadingDirectory(directoryPath)))))))
+    print(sortArray(
+        removeDuplicates(stemming(removeSymbols(removeStopwordsLowerCase(tokenize(loadingDirectory(directoryPath))))))))
+    return sortArray(
+        removeDuplicates(stemming(removeSymbols(removeStopwordsLowerCase(tokenize(loadingDirectory(directoryPath)))))))
+
 
 def sortArray(array):
+    # isStringArray = True
+    # for word in array:
+    #     if word is not str:
+    #         isStringArray = False
+    #         raise TypeError('the content of the array is not strings')
     array.sort()
     return array
 
@@ -99,18 +105,39 @@ def countOccurencyOfWordsPerEmail(directory):
     arrayOfSigWordsTotal = printSignificantWordsofDirectory(directory)
     arrayOfSigWordsFile = loadingFilesIntoArray(directory)
     for array in arrayOfSigWordsFile:
-        vectorMatrix = vectorMatrix + []
+        vectorMatrixbuffer = []
         for word in array:
             for wordtotal in arrayOfSigWordsTotal:
                 if word == wordtotal:
-                    vectorMatrix.append(1)
+                    vectorMatrixbuffer.append(1)
                 else:
-                    vectorMatrix.append(0)
-    print(vectorMatrix)
+                    vectorMatrixbuffer.append(0)
+        vectorMatrix.append(vectorMatrixbuffer)
     return vectorMatrix
 
 
+def hashmapWordOccurency(arraysOfFiles):
+    arraysOfAllHashmaps = []
+    for array in arraysOfFiles:
+        wordOccurencyHashmap = {}
+        for word in printSignificantWordsofDirectory(directory):
+            counter = 0
+            if word in array:
+                while word in array:
+                    counter = counter + 1
+                    array.remove(word)
+                wordOccurencyHashmap.update({word: counter})
+            else:
+                wordOccurencyHashmap.update({word: 0})
+        arraysOfAllHashmaps.append(wordOccurencyHashmap)
+    return arraysOfAllHashmaps
 
-countOccurencyOfWordsPerEmail(directory)
+
+print(printSignificantWordsofDirectory(directory))
+print(loadingFilesIntoArray(directory))
+print(hashmapWordOccurency(loadingFilesIntoArray(directory)))
 
 
+
+
+# print(countOccurencyOfWordsPerEmail(directory))
