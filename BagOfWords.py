@@ -1,5 +1,5 @@
 from os import listdir, path
-
+import math
 import nltk
 from nltk.stem.snowball import SnowballStemmer
 
@@ -84,8 +84,6 @@ def removeDuplicates(arraOfStrings):
 
 
 def printSignificantWordsofDirectory(directoryPath):
-    print(sortArray(
-        removeDuplicates(stemming(removeSymbols(removeStopwordsLowerCase(tokenize(loadingDirectory(directoryPath))))))))
     return sortArray(
         removeDuplicates(stemming(removeSymbols(removeStopwordsLowerCase(tokenize(loadingDirectory(directoryPath)))))))
 
@@ -137,7 +135,32 @@ print(printSignificantWordsofDirectory(directory))
 print(loadingFilesIntoArray(directory))
 print(hashmapWordOccurency(loadingFilesIntoArray(directory)))
 
+def createVectorOutOfHashmap(hashmap):
+    vectorArray = []
+    for key in hashmap:
+        vectorArray.append(hashmap[key])
+    return vectorArray
+
+def createVectorsFromArrayWithHashmaps(arraysOfAllHashmaps):
+    vectorArrays = []
+    for hashmap in arraysOfAllHashmaps:
+        vectorArrays.append(createVectorOutOfHashmap(hashmap))
+    return vectorArrays
 
 
+print(createVectorsFromArrayWithHashmaps(hashmapWordOccurency(loadingFilesIntoArray(directory))))
 
+
+def TermFrequency(vectorA):
+    tfArray = []
+    for number in vectorA:
+        if number > 0:
+            tf = 1 + math.log2(number)
+
+            tfArray.append(tf)
+        else:
+            tfArray.append(0)
+    return tfArray
+
+print(TermFrequency([2, 0, 0, 1, 5, 0, 0, 3]))
 # print(countOccurencyOfWordsPerEmail(directory))
