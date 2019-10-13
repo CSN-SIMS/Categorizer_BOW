@@ -1,5 +1,6 @@
-from os import listdir, path
 import math
+from os import listdir, path
+
 import nltk
 from nltk.stem.snowball import SnowballStemmer
 
@@ -15,7 +16,6 @@ directory = './inputEmails'
 
 def loadingDirectory(directory):
     documents = ""
-    counterOfEmails = 0
     if not path.exists(directory):
         print('no folder exists')
     for filename in listdir(directory):
@@ -25,8 +25,6 @@ def loadingDirectory(directory):
         printSignificantWordOfFile(document)
         documents = documents + " " + document
         email.close()
-        counterOfEmails = counterOfEmails + 1
-    print('Amount of Emails: ' + str(counterOfEmails))
     return documents
 
 
@@ -131,15 +129,20 @@ def hashmapWordOccurency(arraysOfFiles):
     return arraysOfAllHashmaps
 
 
+print('Alles Significanten Wörter:')
 print(printSignificantWordsofDirectory(directory))
+print('Alles sig Wörter pro File: ')
 print(loadingFilesIntoArray(directory))
+print('Hashmap mit Häufigkeit eines Terms: ')
 print(hashmapWordOccurency(loadingFilesIntoArray(directory)))
+
 
 def createVectorOutOfHashmap(hashmap):
     vectorArray = []
     for key in hashmap:
         vectorArray.append(hashmap[key])
     return vectorArray
+
 
 def createVectorsFromArrayWithHashmaps(arraysOfAllHashmaps):
     vectorArrays = []
@@ -148,25 +151,92 @@ def createVectorsFromArrayWithHashmaps(arraysOfAllHashmaps):
     return vectorArrays
 
 
-print(createVectorsFromArrayWithHashmaps(hashmapWordOccurency(loadingFilesIntoArray(directory))))
-
-
-def TermFrequencyOneArray(vectorA):
-    tfArray = []
-    for number in vectorA:
-        if number > 0:
-            tf = 1 + math.log2(number)
-
-            tfArray.append(tf)
+def TermFrequencyOneArray(hashmapOcc):
+    tfHashmap = {}
+    for key in hashmapOcc:
+        if hashmapOcc[key] > 0:
+            tf = 1 + math.log2(hashmapOcc[key])
+            tfHashmap.update({key: tf})
         else:
-            tfArray.append(0)
-    return tfArray
+            tfHashmap.update({key:0})
+    return tfHashmap
 
-def TermFrequencyMatrix(arraysOfVectors):
+
+def TermFrequencyMatrix(arrayOfHashmapOcc):
     tfVectorArrays = []
-    for array in arraysOfVectors:
-        tfVectorArrays.append(TermFrequencyOneArray(array))
+    for hashmap in arrayOfHashmapOcc:
+        tfVectorArrays.append(TermFrequencyOneArray(hashmap))
     return tfVectorArrays
 
-print(TermFrequencyMatrix(createVectorsFromArrayWithHashmaps(hashmapWordOccurency(loadingFilesIntoArray(directory)))))
+print('TF: ' )
+print(TermFrequencyMatrix(
+    hashmapWordOccurency(loadingFilesIntoArray(directory))))
+
+
 # print(countOccurencyOfWordsPerEmail(directory))
+
+def amountOfFiles(directory):
+    counterOfEmails = 0
+    if not path.exists(directory):
+        print('no folder exists')
+    for filename in listdir(directory):
+        counterOfEmails = counterOfEmails + 1
+    return counterOfEmails
+
+
+amountOfFiles(directory)
+
+
+def amountOfFileswithTerm(term, arrayOfHashmaps):
+    counterOfFiles = 0
+    for hashmap in arrayOfHashmaps:
+        if hashmap[term] > 0:
+            counterOfFiles = counterOfFiles + 1
+    return counterOfFiles
+
+
+def amountOfFilesWithAllTerms(allTerm, ArrayOfHashmaps):
+    amountOfFilesWithTermsHashmap = {}
+    for term in allTerm:
+        amountOfFilesWithTermsHashmap.update({term: amountOfFileswithTerm(term, ArrayOfHashmaps)})
+    return amountOfFilesWithTermsHashmap
+
+
+def idf(allTerms, ArrayOfHashmaps, directory):
+    idf = {}
+    amountOfFiles_int = amountOfFiles(directory)
+    amountOfFilesWithallTermHashmap = amountOfFilesWithAllTerms(allTerms, ArrayOfHashmaps)
+    for term in allTerms:
+        for key in amountOfFilesWithallTermHashmap:
+            if term == key:
+                idfNumber = 1 + math.log2(amountOfFiles_int / amountOfFilesWithallTermHashmap[key])
+                idf.update({term: idfNumber})
+    return idf
+
+print('IDF' )
+print(idf(['boy', 'buy', 'flower', 'footbal', 'garden', 'grow', 'mani', 'play'],
+                  [{'boy': 2, 'buy': 0, 'flower': 0, 'footbal': 1, 'garden': 1, 'grow': 0, 'mani': 0,
+                    'play': 1},
+                   {'boy': 0, 'buy': 0, 'flower': 1, 'footbal': 0, 'garden': 1, 'grow': 1, 'mani': 1,
+                    'play': 0},
+                   {'boy': 1, 'buy': 1, 'flower': 0, 'footbal': 1, 'garden': 0, 'grow': 0, 'mani': 2,
+                    'play': 0}],
+                  directory))
+
+
+def tF_IDF(diretory):
+    tfidf = []
+    tf_maps = TermFrequencyMatrix(
+        hashmapWordOccurency(loadingFilesIntoArray(directory)))
+    idf_map = idf(printSignificantWordsofDirectory(directory), hashmapWordOccurency(loadingFilesIntoArray(directory)),
+                  directory)
+    for hashmap in tf_maps:
+        tfidf_map = {}
+        for key in hashmap:
+            result = hashmap[key] * idf_map[key]
+            tfidf_map.update({key:result})
+        tfidf.append(tfidf_map)
+    return tfidf
+print('TFIDF_Map_matrix: ')
+print(tF_IDF(directory))
+print(createVectorsFromArrayWithHashmaps(tF_IDF(directory)))
