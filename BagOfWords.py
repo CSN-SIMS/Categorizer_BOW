@@ -151,7 +151,7 @@ def createVectorsFromArrayWithHashmaps(arraysOfAllHashmaps):
 print(createVectorsFromArrayWithHashmaps(hashmapWordOccurency(loadingFilesIntoArray(directory))))
 
 
-def TermFrequency(vectorA):
+def TermFrequencyOneArray(vectorA):
     tfArray = []
     for number in vectorA:
         if number > 0:
@@ -162,5 +162,11 @@ def TermFrequency(vectorA):
             tfArray.append(0)
     return tfArray
 
-print(TermFrequency([2, 0, 0, 1, 5, 0, 0, 3]))
+def TermFrequencyMatrix(arraysOfVectors):
+    tfVectorArrays = []
+    for array in arraysOfVectors:
+        tfVectorArrays.append(TermFrequencyOneArray(array))
+    return tfVectorArrays
+
+print(TermFrequencyMatrix(createVectorsFromArrayWithHashmaps(hashmapWordOccurency(loadingFilesIntoArray(directory)))))
 # print(countOccurencyOfWordsPerEmail(directory))
