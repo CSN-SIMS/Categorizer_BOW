@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from os import listdir, path
 
 import nltk
@@ -240,3 +241,26 @@ def tF_IDF(diretory):
 print('TFIDF_Map_matrix: ')
 print(tF_IDF(directory))
 print(createVectorsFromArrayWithHashmaps(tF_IDF(directory)))
+
+def compareTwoVectors(vector1,vector2):
+    ancle = 0
+    return ancle
+
+def scalenproduct(vector1, vector2):
+    counter = 0
+    scalenproduct = 0
+    for int in vector1:
+        product = int * vector2[counter]
+        scalenproduct = scalenproduct + product
+        counter = counter + 1
+    return scalenproduct
+
+print(scalenproduct([1,2,3],[3,2,1]))
+
+def lenghOfVector(vector):
+    result = 0
+    sum = 0
+    for int in vector:
+        square = int * int
+        sum = sum + square
+    return math.sqrt(sum)
