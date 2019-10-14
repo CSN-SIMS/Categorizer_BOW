@@ -185,7 +185,7 @@ def amountOfFiles(directory):
     return counterOfEmails
 
 
-amountOfFiles(directory)
+amountOfFiles_int = amountOfFiles(directory)
 
 
 def amountOfFileswithTerm(term, arrayOfHashmaps):
@@ -246,7 +246,7 @@ def compareTwoVectors(vector1,vector2):
     ancle = 0
     return ancle
 
-def scalenproduct(vector1, vector2):
+def scalenproduct2vector(vector1, vector2):
     counter = 0
     scalenproduct = 0
     for int in vector1:
@@ -255,7 +255,7 @@ def scalenproduct(vector1, vector2):
         counter = counter + 1
     return scalenproduct
 
-print(scalenproduct([1,2,3],[3,2,1]))
+print(scalenproduct2vector([1,2,3],[3,2,1]))
 
 def lenghOfVector(vector):
     result = 0
@@ -264,3 +264,46 @@ def lenghOfVector(vector):
         square = int * int
         sum = sum + square
     return math.sqrt(sum)
+
+print(lenghOfVector([1,2,3]))
+
+def cosinusOf2Vectors(vector1, vector2):
+    preresult = scalenproduct2vector(vector1, vector2) / (lenghOfVector(vector1) * lenghOfVector(vector2))
+    result = math.degrees(math.acos(preresult))
+    return result
+
+print(cosinusOf2Vectors([1,2,3],[3,2,1]))
+print(cosinusOf2Vectors(createVectorsFromArrayWithHashmaps(tF_IDF(directory))[0], createVectorsFromArrayWithHashmaps(tF_IDF(directory))[1]))
+
+def angleMatrix(arraysOfVectorsProFile):
+    angleMatrix = []
+    for vector_array2 in arraysOfVectorsProFile:
+        angleArrayRow = []
+        for vector_array1 in arraysOfVectorsProFile:
+            angle = 0
+            angle = cosinusOf2Vectors(vector_array1, vector_array2)
+            angleArrayRow.append(angle)
+        angleMatrix.append(angleArrayRow)
+    return angleMatrix
+
+print(angleMatrix(createVectorsFromArrayWithHashmaps(tF_IDF(directory))))
+
+def mostEqualEmails(angleMatrix):
+    column = 0
+    row = 0
+    smallestAngle = 360
+    mostEuqalEmailrow = 0
+    mostEuqalEmailColumn = 0
+    while row <= (amountOfFiles_int/2):
+        while column < amountOfFiles_int:
+            if column != row:
+                if smallestAngle > angleMatrix[row][column]:
+                    smallestAngle = angleMatrix[row][column]
+                    mostEuqalEmailColumn = column
+                    mostEuqalEmailrow = row
+            column = column +1
+        row = row +1
+    return 'Email('+ str(mostEuqalEmailrow+1)+') and Email('+str(mostEuqalEmailColumn+1)+') are very equal'
+
+print(mostEqualEmails(angleMatrix(createVectorsFromArrayWithHashmaps(tF_IDF(directory)))))
+
